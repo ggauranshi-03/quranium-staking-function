@@ -1,1 +1,1 @@
-export { default as qrnlogo } from "./qrnlogo.svg"
+export { default as quranium } from "./Quranium.png";

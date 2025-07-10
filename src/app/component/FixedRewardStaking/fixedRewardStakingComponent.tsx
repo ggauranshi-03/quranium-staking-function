@@ -476,38 +476,30 @@ const FixedRewardStakingComponent = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white p-4">
-      {/* Header */}
-      <header className="max-w-6xl mx-auto py-4 flex flex-col md:flex-row justify-between items-center">
-        <h1 className="text-2xl font-bold text-indigo-300 mb-4 md:mb-0">
-          Quranium
-          <span className="block text-sm text-indigo-200 mt-1">
-            The Uncrackable foundation of Digital Era
-          </span>
-        </h1>
-      </header>
-
+    <div className="min-h-screen bg-[#0A0A0A] text-white p-4">
       {/* Main Content */}
       <main className="max-w-2xl mx-auto mt-8">
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-indigo-500/30 shadow-2xl shadow-indigo-900/30">
+        <div className="bg-[#0f0f0f] backdrop-blur-sm rounded-xl p-6 border-2 border-[#4F46E5]/60 shadow-2xl shadow-[#4F46E5]/30">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-bold mb-2 text-white bg-clip-text text-transparent">
               Fixed Yield Staking
             </h2>
-            <p className="text-indigo-200">
-              Stake and earn 20% fixed rewards with Quranium
+            <p className="text-[#ffffff]">
+              Stake and earn rewards with Quranium
             </p>
-            <div className="mt-2 p-2 bg-indigo-900/50 rounded-lg inline-block">
-              <p className="text-indigo-200">
+            <div className="mt-2 p-2 bg-[#4F46E5]/20 rounded-lg border border-[#4F46E5]/60 inline-block">
+              <p className="text-[#ffffff]">
                 Contract Balance:
-                <span className="font-bold ml-2">{contractBalance} QRN</span>
+                <span className="font-bold ml-2 text-white">
+                  {contractBalance} QRN
+                </span>
               </p>
             </div>
           </div>
 
           {/* Stake Form */}
-          <div className="mb-6 p-4 bg-gray-700/50 rounded-lg border border-indigo-500/30">
-            <h2 className="text-xl font-semibold mb-4 text-indigo-200">
+          <div className="mb-6 p-4 bg-[#121212] rounded-lg border-2 border-[#4F46E5]/60">
+            <h2 className="text-xl font-semibold mb-4 text-[#ffffff]">
               Stake QRN
             </h2>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -516,14 +508,14 @@ const FixedRewardStakingComponent = ({
                 value={stakeAmount}
                 onChange={(e) => setStakeAmount(e.target.value)}
                 placeholder="QRN amount"
-                className="flex-1 p-3 bg-gray-700 border border-indigo-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="flex-1 p-3 bg-[#1E1E1E] border-2 border-[#4F46E5]/70 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:ring-opacity-70"
                 min="0"
                 step="0.001"
               />
               <button
                 onClick={handleStake}
                 disabled={loading || !stakeAmount}
-                className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-medium rounded-lg border-2 border-[#4F46E5]/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Processing..." : "Stake"}
               </button>
@@ -537,16 +529,16 @@ const FixedRewardStakingComponent = ({
               disabled={
                 loading || !stakeInfo || Number(stakeInfo.stakedBalance) === 0
               }
-              className="px-8 py-3 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-medium rounded-lg border-2 border-[#4F46E5]/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Processing..." : "Withdraw All"}
+              {loading ? "Processing..." : "Unstake and Claim"}
             </button>
           </div>
 
           {/* Owner Topup Section */}
           {isOwner && (
-            <div className="mb-6 p-4 bg-purple-900/30 rounded-lg border border-purple-500/30">
-              <h2 className="text-xl font-semibold mb-4 text-purple-200">
+            <div className="mb-6 p-4 bg-[#4F46E5]/10 rounded-lg border-2 border-[#4F46E5]/60">
+              <h2 className="text-xl font-semibold mb-4 text-[#ffffff]">
                 Reward Pool Top-up (Owner Only)
               </h2>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -555,14 +547,14 @@ const FixedRewardStakingComponent = ({
                   value={topupAmount}
                   onChange={(e) => setTopupAmount(e.target.value)}
                   placeholder="QRN amount"
-                  className="flex-1 p-3 bg-gray-700 border border-purple-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 p-3 bg-[#1E1E1E] border-2 border-[#4F46E5]/70 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:ring-opacity-70"
                   min="0"
                   step="0.001"
                 />
                 <button
                   onClick={handleTopup}
                   disabled={loading || !topupAmount}
-                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-medium rounded-lg border-2 border-[#4F46E5]/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? "Processing..." : "Top-up Rewards"}
                 </button>
@@ -572,26 +564,26 @@ const FixedRewardStakingComponent = ({
 
           {/* Stake Information */}
           {stakeInfo && (
-            <div className="mt-6 p-4 bg-gray-700/50 rounded-lg border border-indigo-500/30">
-              <h2 className="text-xl font-semibold mb-4 text-indigo-200">
+            <div className="mt-6 p-4 bg-[#121212] rounded-lg border-2 border-[#4F46E5]/60">
+              <h2 className="text-xl font-semibold mb-4 text-[#ffffff]">
                 Your Staking Status
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-800/50 rounded-lg">
-                  <p className="text-indigo-200">Staked Balance:</p>
-                  <p className="font-bold text-lg">
+                <div className="p-3 bg-[#1E1E1E] rounded-lg border border-[#4F46E5]/40">
+                  <p className="text-[#ffffff]">Staked Balance:</p>
+                  <p className="font-bold text-lg text-white">
                     {stakeInfo.stakedBalance} QRN
                   </p>
                 </div>
-                <div className="p-3 bg-gray-800/50 rounded-lg">
-                  <p className="text-indigo-200">Current Reward:</p>
-                  <p className="font-bold text-lg text-green-400">
+                <div className="p-3 bg-[#1E1E1E] rounded-lg border border-[#4F46E5]/40">
+                  <p className="text-[#ffffff]">Current Reward:</p>
+                  <p className="font-bold text-lg text-[#4ade80]">
                     {stakeInfo.currentReward} QRN
                   </p>
                 </div>
-                <div className="p-3 bg-gray-800/50 rounded-lg col-span-1 md:col-span-2">
-                  <p className="text-indigo-200">Total Withdrawable:</p>
-                  <p className="font-bold text-lg text-amber-400">
+                <div className="p-3 bg-[#1E1E1E] rounded-lg col-span-1 md:col-span-2 border border-[#4F46E5]/40">
+                  <p className="text-[#ffffff]">Total Unstakable:</p>
+                  <p className="font-bold text-lg text-[#facc15]">
                     {stakeInfo.withdrawableAmount} QRN
                   </p>
                 </div>
@@ -604,7 +596,7 @@ const FixedRewardStakingComponent = ({
             <button
               onClick={fetchStakeInfo}
               disabled={loading}
-              className="px-6 py-3 bg-indigo-700 hover:bg-indigo-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-medium rounded-lg border-2 border-[#4F46E5]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Refresh Data
             </button>
@@ -612,19 +604,12 @@ const FixedRewardStakingComponent = ({
 
           {/* Error Display */}
           {error && (
-            <div className="mt-4 p-3 bg-red-900/50 text-red-200 rounded-lg border border-red-700">
+            <div className="mt-4 p-3 bg-[#7f1d1d] text-[#fca5a5] rounded-lg border-2 border-[#ef4444]">
               {error}
             </div>
           )}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="max-w-6xl mx-auto mt-8 py-4 text-center text-indigo-300">
-        <p>
-          © {new Date().getFullYear()} Quranium Network. All rights reserved.
-        </p>
-      </footer>
     </div>
   );
 };
