@@ -2,12 +2,25 @@
 
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-const CONTRACT_ADDRESS = "0xf3ffe752da5c73324afe19c1bcc09836b5a510b1";
+const CONTRACT_ADDRESS = "0xe35df928d9bb9c0dd7862db06bf7fd92ce1dbb90";
 const CONTRACT_ABI = [
   {
     inputs: [],
     stateMutability: "nonpayable",
     type: "constructor",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "OwnerWithdrawal",
+    type: "event",
   },
   {
     anonymous: false,
@@ -57,7 +70,33 @@ const CONTRACT_ABI = [
         type: "uint256",
       },
     ],
-    name: "TopUp",
+    name: "TopUpRewardPool",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "UserBlocked",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "UserUnblocked",
     type: "event",
   },
   {
@@ -80,8 +119,27 @@ const CONTRACT_ABI = [
     type: "event",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "oldRate",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newRate",
+        type: "uint256",
+      },
+    ],
+    name: "YieldRateChanged",
+    type: "event",
+  },
+  {
     inputs: [],
-    name: "REWARD_RATE",
+    name: "SECONDS_PER_YEAR",
     outputs: [
       {
         internalType: "uint256",
@@ -90,6 +148,19 @@ const CONTRACT_ABI = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "blockUser",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -145,6 +216,38 @@ const CONTRACT_ABI = [
   },
   {
     inputs: [],
+    name: "getYieldRate",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "isUserBlocked",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "owner",
     outputs: [
       {
@@ -154,6 +257,19 @@ const CONTRACT_ABI = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "newRate",
+        type: "uint256",
+      },
+    ],
+    name: "setYieldRate",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -184,14 +300,56 @@ const CONTRACT_ABI = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "unblockUser",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "withdraw",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "withdrawOwnerFunds",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "yieldRate",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    stateMutability: "payable",
+    type: "receive",
+  },
 ];
-
 interface StakeInfo {
   stakedBalance: string;
   currentReward: string;
@@ -210,7 +368,36 @@ const FixedRewardStakingComponent = ({
   const [isOwner, setIsOwner] = useState<boolean>(false);
   const [topupAmount, setTopupAmount] = useState<string>("");
   const [contractBalance, setContractBalance] = useState<string>("0");
+  const [newOwnerAddress, setNewOwnerAddress] = useState<string>("");
+  const [transferring, setTransferring] = useState<boolean>(false);
+  const handleTransferOwnership = async () => {
+    if (!userAddress || !newOwnerAddress) {
+      setError("Please enter a valid address");
+      return;
+    }
 
+    if (!ethers.isAddress(newOwnerAddress)) {
+      setError("Invalid Ethereum address");
+      return;
+    }
+
+    try {
+      setTransferring(true);
+      await sendQSafeTransaction("transferOwnership", BigInt(0), [
+        newOwnerAddress,
+      ]);
+
+      // Refresh owner status
+      await fetchStakeInfo();
+      setNewOwnerAddress("");
+      setError("");
+    } catch (err: any) {
+      console.error("Ownership transfer error:", err);
+      setError(`Transfer failed: ${err.message || "Unknown error"}`);
+    } finally {
+      setTransferring(false);
+    }
+  };
   const fetchStakeInfo = async () => {
     if (!userAddress) {
       setStakeInfo(null);
@@ -263,7 +450,8 @@ const FixedRewardStakingComponent = ({
   // QSafe-specific transaction handling
   const sendQSafeTransaction = async (
     functionName: string,
-    value: bigint = BigInt(0)
+    value: bigint = BigInt(0),
+    params: any[] = []
   ) => {
     if (!window.qsafe?.providers?.ethereum || !userAddress) {
       throw new Error("QSafe wallet not connected");
@@ -273,7 +461,7 @@ const FixedRewardStakingComponent = ({
     const contractInterface = new ethers.Interface(CONTRACT_ABI);
 
     // 1. Encode function data
-    const data = contractInterface.encodeFunctionData(functionName);
+    const data = contractInterface.encodeFunctionData(functionName, params);
 
     // 2. Get gas price
     let gasPrice: string;
@@ -558,6 +746,30 @@ const FixedRewardStakingComponent = ({
                 >
                   {loading ? "Processing..." : "Top-up Rewards"}
                 </button>
+              </div>
+              <div className="mb-6 p-4 bg-[#4F46E5]/10 rounded-lg border-2 border-[#4F46E5]/60">
+                <h2 className="text-xl font-semibold mb-4 text-[#ffffff]">
+                  Transfer Contract Ownership
+                </h2>
+                <div className="flex flex-col gap-3">
+                  <input
+                    type="text"
+                    value={newOwnerAddress}
+                    onChange={(e) => setNewOwnerAddress(e.target.value)}
+                    placeholder="New owner address (0x...)"
+                    className="w-full p-3 bg-[#1E1E1E] border-2 border-[#4F46E5]/70 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:ring-opacity-70"
+                  />
+                  <button
+                    onClick={handleTransferOwnership}
+                    disabled={transferring || !newOwnerAddress}
+                    className="px-6 py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-medium rounded-lg border-2 border-[#4F46E5]/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {transferring ? "Transferring..." : "Transfer Ownership"}
+                  </button>
+                </div>
+                <p className="mt-2 text-sm text-[#ffffff]/70">
+                  Warning: This will permanently transfer contract ownership
+                </p>
               </div>
             </div>
           )}
