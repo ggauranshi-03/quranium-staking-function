@@ -5,6 +5,7 @@ import Provider from "./component/Provider/Provider";
 import { headers } from "next/headers";
 
 import { Montserrat } from "next/font/google";
+import AutoRefreshHandler from "./component/AutoRefresh/AutoRefresh";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -19,6 +20,7 @@ export default async function RootLayout({
       <body
         className={`${montserrat.className} flex flex-col min-h-screen w-full main-bg max-w-full`}
       >
+        <AutoRefreshHandler />
         <Provider>
           <div className="main-container">
             {children}

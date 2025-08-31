@@ -22,7 +22,7 @@ export function useQsafeQL1FullInfo() {
   const [clientVersion, setClientVersion] = useState<string | null>(null);
   const [txCount, setTxCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true); // ✅ new loading state
-
+  const WALLET_CONNECTED_KEY = "wallet_connected";
   const fetchData = async (address: string, provider: any) => {
     try {
       const [balanceHex, chainIdHex, gasPriceHex, clientVer, txCountHex] =
@@ -62,6 +62,7 @@ export function useQsafeQL1FullInfo() {
         setAddress(addr);
         await fetchData(addr, provider);
         setIsLoading(false); // ✅ done loading
+        localStorage.setItem(WALLET_CONNECTED_KEY, "true");
         return addr;
       } catch (err) {
         console.error("Qsafe connection error:", err);
