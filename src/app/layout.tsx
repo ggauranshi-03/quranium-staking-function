@@ -20,9 +20,9 @@ export default async function RootLayout({
       <body
         className={`${montserrat.className} flex flex-col min-h-screen w-full main-bg max-w-full`}
       >
-        <AutoRefreshHandler />
         <Provider>
           <div className="main-container">
+            <AutoRefreshHandler />
             {children}
             <Footer />
           </div>

@@ -25,7 +25,7 @@ const ConnectButton = () => {
   const handleConnect = async () => {
     try {
       connect();
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error("Connection error:", error);
     }
